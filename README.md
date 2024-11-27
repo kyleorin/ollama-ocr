@@ -1,15 +1,17 @@
 # Ollama OCR
 
-An OCR tool based on Llama 3.2-Vision that accurately recognizes text in images while preserving the original formatting.
+An OCR tool based on Ollama-supported visual models such as [Llama 3.2-Vision](https://ollama.com/library/llama3.2-vision) or [MiniCPM-V 2.6](https://ollama.com/library/minicpm-v)  accurately recognizes text in images while preserving the original formatting.
 
 ## Features
 
-- 🚀 High accuracy text recognition using Llama 3.2-Vision model
+- 🚀 High accuracy text recognition using Llama 3.2-Vision/MiniCPM-V 2.6 model
 - 📝 Preserves original text formatting and structure
 - 🖼️ Supports multiple image formats: JPG, JPEG, PNG
 - ⚡️ Customizable recognition prompts and models
 - 🔍 Markdown output format option
 - 💪 Robust error handling
+
+> Accurate text recognition on macOS: [macos-vision-ocr](https://github.com/bytefer/macos-vision-ocr).
 
 ## System Requirements
 
@@ -35,7 +37,7 @@ pnpm add ollama-ocr
 
 ### Basic Usage
 
-```typescript
+```javascript
 import { ollamaOCR, DEFAULT_OCR_SYSTEM_PROMPT } from "ollama-ocr";
 
 async function runOCR() {
@@ -49,7 +51,7 @@ async function runOCR() {
 
 ### Markdown Output
 
-```typescript
+```javascript
 import { ollamaOCR, DEFAULT_MARKDOWN_SYSTEM_PROMPT } from "ollama-ocr";
 
 async function runOCR() {
@@ -61,11 +63,24 @@ async function runOCR() {
 }
 ```
 
+## Use MiniCPM-V 2.6 Vision Model
+
+```javascript
+async function runOCR() {
+  const text = await ollamaOCR({
+    model: "minicpm-v",
+    filePath: "./handwriting.jpg.jpg",
+    systemPrompt: DEFAULT_OCR_SYSTEM_PROMPT,
+  });
+  console.log(text);
+}
+```
+
 ## Error Handling
 
 The tool provides comprehensive error handling:
 
-```typescript
+```javascript
 import { ollamaOCR, LlamaOCRError, ErrorCode } from "ollama-ocr";
 
 async function runOCR() {
