@@ -5,5 +5,9 @@ COPY package*.json ./
 RUN pnpm install
 COPY . .
 RUN pnpm build
+
+# Create uploads directory with proper permissions
+RUN mkdir -p uploads && chmod 777 uploads
+
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["node", "dist/server.js"]
