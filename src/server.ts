@@ -101,6 +101,57 @@ app.post('/ocr', upload.single('file'), async (req, res) => {
   }
 });
 
+// Add test endpoint for image processing only
+app.post('/test-image', upload.single('file'), async (req, res) => {
+  console.log('Image test request received');
+  try {
+    let imagePath;
+    
+    if (req.body.url) {
+      console.log('Testing URL image:', req.body.url);
+      const response = await fetch(req.body.url);
+      if (!response.ok) {
+        return res.status(400).json({ 
+          error: 'Failed to fetch image from URL',
+          status: response.status,
+          statusText: response.statusText
+        });
+      }
+      const buffer = await response.buffer();
+      const tempPath = path.join(uploadsDir, `${Date.now()}.jpg`);
+      await fs.writeFile(tempPath, buffer);
+      imagePath = tempPath;
+      
+      console.log('Successfully downloaded and saved image to:', imagePath);
+      res.json({ 
+        success: true, 
+        message: 'Image processed successfully',
+        path: imagePath,
+        size: buffer.length
+      });
+
+      // Cleanup
+      await fs.unlink(imagePath).catch(console.error);
+    } else if (req.file) {
+      imagePath = req.file.path;
+      res.json({ 
+        success: true, 
+        message: 'File uploaded successfully',
+        path: imagePath,
+        size: (await fs.stat(imagePath)).size
+      });
+    } else {
+      return res.status(400).json({ error: 'No file or URL provided' });
+    }
+  } catch (error: any) {
+    console.error('Image processing error:', error);
+    res.status(500).json({ 
+      error: 'Image processing failed',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
 // Add error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {
   console.error('Unhandled error:', err);
