@@ -11,9 +11,30 @@ app.use(cors());
 app.use(express.json());
 
 // Add basic root endpoint for quick testing
+// Add more basic test endpoints
 app.get('/', (req, res) => {
+  console.log('Root endpoint hit');
   res.json({ status: 'Server is running' });
 });
+
+app.get('/ping', (req, res) => {
+  console.log('Ping received');
+  res.json({ pong: new Date().toISOString() });
+});
+
+// Increase timeout for image processing
+const timeoutMiddleware = (req: any, res: any, next: any) => {
+  res.setTimeout(120000, () => {
+    console.log('Request has timed out.');
+    res.status(503).send({
+      error: 'Request timeout',
+      message: 'The request took too long to process'
+    });
+  });
+  next();
+};
+
+app.use(timeoutMiddleware);
 
 // Configure Ollama endpoint with more logging
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
