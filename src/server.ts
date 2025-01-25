@@ -17,9 +17,15 @@ app.get('/', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
+// Simplify the server for testing
 app.get('/ping', (req, res) => {
-  console.log('Ping received');
-  res.json({ pong: new Date().toISOString() });
+  console.log('Ping received at:', new Date().toISOString());
+  res.json({ 
+    status: 'alive',
+    time: new Date().toISOString(),
+    memory: process.memoryUsage(),
+    uptime: process.uptime()
+  });
 });
 
 // Increase timeout for image processing
