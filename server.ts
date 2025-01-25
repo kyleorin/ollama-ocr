@@ -19,7 +19,6 @@ fs.mkdir(uploadsDir, { recursive: true }).catch(console.error);
 
 const upload = multer({ dest: uploadsDir });
 
-// ... existing code ...
 app.get('/health', (req, res) => {
     res.json({ 
       status: 'ok', 
@@ -27,17 +26,16 @@ app.get('/health', (req, res) => {
       timestamp: new Date().toISOString()
     });
   });
-  // ... existing code ...
 
 app.post('/ocr', upload.single('file'), async (req, res) => {
   try {
     // Test Ollama connection first
     try {
       await fetch(`${OLLAMA_HOST}/api/tags`);
-    } catch (error) {
+    } catch (error: any) {
       return res.status(503).json({
         error: 'Ollama server not available',
-        details: error.message
+        details: error.message || 'Unknown error'
       });
     }
 
@@ -67,16 +65,16 @@ app.post('/ocr', upload.single('file'), async (req, res) => {
     }
 
     res.json({ text });
-  } catch (error) {
+  } catch (error: any) {
     console.error('OCR Error:', error);
     res.status(500).json({ 
       error: 'OCR processing failed',
-      details: error.message
+      details: error.message || 'Unknown error'
     });
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
   console.log(`Using Ollama host: ${OLLAMA_HOST}`);
