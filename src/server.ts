@@ -190,11 +190,22 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
-  console.log(`Using Ollama host: ${OLLAMA_HOST}`);
-  console.log('Environment:', {
-    NODE_ENV: process.env.NODE_ENV,
-    PORT: process.env.PORT,
-    PWD: process.cwd()
-  });
+  console.log('==================================');
+  console.log('Server startup information:');
+  console.log('- Port:', port);
+  console.log('- Environment:', process.env.NODE_ENV);
+  console.log('- Working Directory:', process.cwd());
+  console.log('- Node Version:', process.version);
+  console.log('- Memory Usage:', process.memoryUsage());
+  console.log('==================================');
+});
+
+// Add uncaught exception handlers
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
 });
