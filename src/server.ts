@@ -10,8 +10,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configure Ollama endpoint
+// Add basic root endpoint for quick testing
+app.get('/', (req, res) => {
+  res.json({ status: 'Server is running' });
+});
+
+// Configure Ollama endpoint with more logging
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
+console.log('Starting server with OLLAMA_HOST:', OLLAMA_HOST);
 process.env.OLLAMA_HOST = OLLAMA_HOST;
 
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -81,8 +87,22 @@ app.post('/ocr', upload.single('file'), async (req, res) => {
   }
 });
 
+// Add error handling middleware
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    details: err.message
+  });
+});
+
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
   console.log(`Using Ollama host: ${OLLAMA_HOST}`);
+  console.log('Environment:', {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    PWD: process.cwd()
+  });
 });
