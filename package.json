@@ -23,11 +23,10 @@
     "import": "./dist/index.mjs"
   },
   "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsup src/index.ts src/server.ts --format cjs,esm --dts",
-    "start": "node dist/server.js",
-    "build-fast": "tsup src/index.ts src/server.ts --format cjs,esm --dts"
-  },
+    "scripts": {
+      "build": "tsup src/index.ts src/server.ts --format cjs,esm --dts",
+      "start": "node dist/server.js"
+    },
   "license": "MIT",
   "dependencies": {
     "ollama": "^0.5.10",
