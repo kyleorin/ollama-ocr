@@ -36,19 +36,33 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Add retry logic for Ollama connection
+async function waitForOllama(maxRetries = 3, delay = 10000) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      console.log(`Attempt ${i + 1} to connect to Ollama...`);
+      const response = await fetch(`${OLLAMA_HOST}/api/tags`);
+      if (response.ok) {
+        console.log('Successfully connected to Ollama');
+        return true;
+      }
+    } catch (error) {
+      console.log(`Attempt ${i + 1} failed, waiting ${delay/1000}s...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  return false;
+}
+
 app.post('/ocr', upload.single('file'), async (req, res) => {
   console.log('OCR request received');
   try {
-    // Test Ollama connection first
-    console.log('Testing Ollama connection to:', OLLAMA_HOST);
-    try {
-      const response = await fetch(`${OLLAMA_HOST}/api/tags`);
-      console.log('Ollama response:', await response.text());
-    } catch (error: any) {
-      console.error('Ollama connection error:', error);
+    // Wait for Ollama to be available
+    const isOllamaReady = await waitForOllama();
+    if (!isOllamaReady) {
       return res.status(503).json({
         error: 'Ollama server not available',
-        details: error.message || 'Unknown error'
+        details: 'Server is starting up, please try again in a minute'
       });
     }
 
