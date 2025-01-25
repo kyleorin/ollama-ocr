@@ -20,19 +20,26 @@ fs.mkdir(uploadsDir, { recursive: true }).catch(console.error);
 const upload = multer({ dest: uploadsDir });
 
 app.get('/health', (req, res) => {
-    res.json({ 
-      status: 'ok', 
-      ollama_host: OLLAMA_HOST,
-      timestamp: new Date().toISOString()
-    });
+  console.log('Health check requested');
+  console.log('OLLAMA_HOST:', OLLAMA_HOST);
+  res.json({ 
+    status: 'ok', 
+    ollama_host: OLLAMA_HOST,
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV
   });
+});
 
 app.post('/ocr', upload.single('file'), async (req, res) => {
+  console.log('OCR request received');
   try {
     // Test Ollama connection first
+    console.log('Testing Ollama connection to:', OLLAMA_HOST);
     try {
-      await fetch(`${OLLAMA_HOST}/api/tags`);
+      const response = await fetch(`${OLLAMA_HOST}/api/tags`);
+      console.log('Ollama response:', await response.text());
     } catch (error: any) {
+      console.error('Ollama connection error:', error);
       return res.status(503).json({
         error: 'Ollama server not available',
         details: error.message || 'Unknown error'
